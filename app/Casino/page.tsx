@@ -1,10 +1,6 @@
 import React from 'react'
 import Image from 'next/image'
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover"
+
 
 export default function Casino() {
   return (
@@ -15,7 +11,6 @@ export default function Casino() {
           <Image src="/casino2.png" alt="casino" width={1000} height={100} className=' w-[70rem] h-[30rem] bg-blue-500 rounded-lg' />
         </div>
       </div>
-
       <div className=" w-fit m-10">
         <h1 className="font-sans text-[100px]">Live Games play and earn</h1>
         <div className=" flex gap-8 ">
@@ -28,7 +23,6 @@ export default function Casino() {
           <div className="w-80 h-[400px] bg-white">
             <img src="/plinko.avif" />
           </div>
-          
         </div>
       </div>
       <div className=" w-fit m-10">
