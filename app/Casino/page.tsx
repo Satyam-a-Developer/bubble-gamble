@@ -1,7 +1,6 @@
 import React from 'react'
 import Image from 'next/image'
-
-
+import Link from 'next/link'
 export default function Casino() {
   return (
     <div className='flex  flex-col items-center justify-between p-24'>
@@ -14,15 +13,22 @@ export default function Casino() {
       <div className=" w-fit m-10">
         <h1 className="font-sans text-[100px]">Live Games play and earn</h1>
         <div className=" flex gap-8 ">
-          <div className="w-80 h-[400px] bg-white">
-            <img src="/crash.avif" />
-          </div>
-          <div className="w-80 h-[400px] bg-white">
-            <img src="/minies.avif" />
-          </div>
-          <div className="w-80 h-[400px] bg-white">
-            <img src="/plinko.avif" />
-          </div>
+          <Link href="/crashgame">
+            <div className="w-80 h-[400px] bg-white">
+              <img src="/crash.avif" />
+            </div>
+          </Link>
+          <Link href='/mines'>
+            <div className="w-80 h-[400px] bg-white">
+              <img src="/minies.avif" />
+            </div>
+          </Link>
+          <Link href='/plinko'>
+            <div className="w-80 h-[400px] bg-white">
+              <img src="/plinko.avif" alt="Plinko" />
+            </div>
+          </Link>
+
         </div>
       </div>
       <div className=" w-fit m-10">

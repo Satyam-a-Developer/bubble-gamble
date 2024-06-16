@@ -61,7 +61,7 @@ export default function page() {
                                     <div className="grid w-full h-full  gap-4">
                                         <div className="flex flex-col space-y-1.5 m-3 ">
                                             <Label htmlFor="name">Your bet</Label>
-                                            <Input id="name" placeholder="Bet Amount" />
+                                            <Input id="name" placeholder="Bet Amount"  type="number"/>
                                         </div>
                                         <div className="flex flex-col space-y-1.5  m-3">
                                             <Label htmlFor="framework">Mines</Label>
