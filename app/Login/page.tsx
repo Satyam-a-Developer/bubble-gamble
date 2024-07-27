@@ -2,7 +2,7 @@ import React from 'react'
 
 export default function Login() {
   return (
-    <form className="min-w-7 mx-auto flex min-h-screen flex-col items-center p-24 min-w-100 ">
+    <form className="min-w-7 mx-auto flex min-h-screen flex-col items-center p-24 min-w-100 bg-slate-50 ">
     <div className="mb-5">
       <label
         htmlFor="email"
@@ -13,7 +13,7 @@ export default function Login() {
       <input
         type="email"
         id="email"
-        className="bg-gray-50 border border-gray-300  text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+        className="bg-black border border-gray-300  text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
         placeholder="name@flowbite.com"
         required
       />

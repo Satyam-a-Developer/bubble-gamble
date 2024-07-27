@@ -26,6 +26,7 @@ export default function page() {
 
     const handleClick2 = (index: any) => {
         const newActiveBoxes = activeBoxes.map((box, i) => (i === index ? !box : false));
+        console.log(newActiveBoxes)
         setActiveBoxes(newActiveBoxes);
     };
     return (
@@ -53,15 +54,13 @@ export default function page() {
                         </button>
                     </div>
                     <div className='w-[350px] h-[700px]  overflow-hidden flex  '>
-
                         <Card className="w-[350px] bg-slate-700 text-white h-[400px] ">
-
                             <CardContent>
                                 <form>
                                     <div className="grid w-full h-full  gap-4">
                                         <div className="flex flex-col space-y-1.5 m-3 ">
                                             <Label htmlFor="name">Your bet</Label>
-                                            <Input id="name" placeholder="Bet Amount"  type="number"/>
+                                            <Input id="name" placeholder="Bet Amount" type="number" />
                                         </div>
                                         <div className="flex flex-col space-y-1.5  m-3">
                                             <Label htmlFor="framework">Mines</Label>
@@ -105,7 +104,7 @@ export default function page() {
                             </CardContent>
 
                         </Card>
-                     
+
                     </div>
 
                 </div>
