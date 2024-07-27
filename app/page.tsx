@@ -3,7 +3,9 @@ import Link from "next/link";
 import { useState } from "react";
 export default function Home() {
   return (
+    
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
+        
           <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm  flex-direction-row">
           <p>
             A gambling warning list, also known as a self-exclusion list, is a
