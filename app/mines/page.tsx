@@ -9,12 +9,11 @@ import React, { useState } from 'react';
 
 export default function Page() {
     const [randombomb, setRandomBomb] = useState<number[]>([]);
-    const [betvalue , setbetvalue] = useState(" ")
+    const [betvalue, setbetvalue] = useState(" ")
     const [bet, setBet] = useState<boolean>(false);
     const [activeButton, setActiveButton] = useState<'Manual' | 'Auto'>('Manual');
     const [activeBoxes, setActiveBoxes] = useState<boolean[]>(Array(25).fill(false));
     const [mines, setMines] = useState<number>(1);
-     
     const handleClick = (button: 'Manual' | 'Auto') => {
         setActiveButton(button);
     };
@@ -23,9 +22,9 @@ export default function Page() {
         const newActiveBoxes = activeBoxes.map((box, i) => (i === index ? !box : box));
         setActiveBoxes(newActiveBoxes);
         if (randombomb.includes(index)) {
-           let kedk = betvalue - 50000;
-           console.log(kedk)
-           alert(`'You hit a bomb! You lost.Currently u have ${kedk}'`);
+            let kedk = 50000 - betvalue;
+            console.log(kedk)
+            alert(`'You hit a bomb! You lost.Currently u have ${kedk}'`);
         }
     };
 

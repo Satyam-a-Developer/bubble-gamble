@@ -9,6 +9,19 @@ import {
 } from "@/components/ui/carousel"
 
 export default function CarouselDemo() {
+  fetch('https://api.cricapi.com/v1/currentMatches?apikey=0bbf226d-47b9-41b1-bde1-5b98eb0b0758&offset=0')
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok ' + response.statusText);
+      }
+      return response.json(); // Parse JSON data from the response
+    })
+    .then(data => {
+      console.log(data.name); // Handle the JSON data
+    })
+    .catch(error => {
+      console.error('There was a problem with the fetch operation:', error);
+    });
   return (
     <main>
       <div className="flex min-h-screen flex-col items-center p-24">
@@ -25,20 +38,7 @@ export default function CarouselDemo() {
           <CarouselNext />
         </Carousel>
       </div>
-      <div className=" w-fit m-10">
-        <h1 className="font-sans text-[100px]">Live Events bet now</h1>
-        <div className=" flex gap-8 ">
-          <div className="w-80 h-[400px] bg-white">
-            <img src="/crash.avif" />
-          </div>
-          <div className="w-80 h-[400px] bg-white">
-            <img src="/minies.avif" />
-          </div>
-          <div className="w-80 h-[400px] bg-white">
-            <img src="/plinko.avif" />
-          </div>
-        </div>
-      </div>
+
       <div className=" w-fit m-10">
         <h1 className="font-sans text-[100px]">Upcoming Events</h1>
       </div>
