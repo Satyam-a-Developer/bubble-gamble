@@ -15,17 +15,17 @@ export default function Casino() {
         <div className=" flex gap-8 ">
           <Link href="/crashgame">
             <div className="w-80 h-[400px] bg-white">
-              <img src="/crash.avif" />
+              <Image src="/crash.avif" alt={"image"} />
             </div>
           </Link>
           <Link href='/mines'>
             <div className="w-80 h-[400px] bg-white">
-              <img src="/minies.avif" />
+              <Image src="/minies.avif" alt={"image"} />
             </div>
           </Link>
           <Link href='/plinko'>
             <div className="w-80 h-[400px] bg-white">
-              <img src="/plinko.avif" alt="Plinko" />
+              <Image src="/plinko.avif" alt={"image"}  />
             </div>
           </Link>
 
@@ -35,16 +35,16 @@ export default function Casino() {
         <h1 className="font-sans text-[100px]">Live Games </h1>
         <div className=" flex gap-8 ">
           <div className="w-80 h-[400px] bg-white">
-            <img src="/casino.gmaes.avif" />
+            <Image src="/casino.gmaes.avif" alt={"image"}/>
           </div>
           <div className="w-80 h-[400px] bg-white">
-            <img src="/casinogmes2.avif" />
+            <Image src="/casinogmes2.avif" alt={"image"} />
           </div>
           <div className="w-80 h-[400px] bg-white">
-            <img src="/stake .avif" />
+            <Image src="/stake .avif" alt={"image"} />
           </div>
           <div className="w-80 h-[400px] bg-white">
-            <img src="/casinostake.avif" />
+            <Image src="/casinostake.avif" alt={"image"} />
           </div>
         </div>
       </div>

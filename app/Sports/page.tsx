@@ -1,5 +1,6 @@
 import * as React from "react"
 import { Card, CardContent } from "@/components/ui/card"
+import Image from "next/image";
 import {
   Carousel,
   CarouselContent,
@@ -28,10 +29,10 @@ export default function CarouselDemo() {
         <Carousel className="w-[900px] ">
           <CarouselContent >
             <CarouselItem>
-              <img src="/logo.png" className="rounded-lg w-[1200px] h-[600px]" alt="Image description" />
+              <Image src="/logo.png" className="rounded-lg w-[1200px] h-[600px]" alt="Image description" />
             </CarouselItem>
             <CarouselItem>
-              <img src="/logo.png" className="rounded-lg w-[1200px] h-[600px]" alt="Image description" />
+              <Image src="/logo.png" className="rounded-lg w-[1200px] h-[600px]" alt="Image description" />
             </CarouselItem>
           </CarouselContent>
           <CarouselPrevious />

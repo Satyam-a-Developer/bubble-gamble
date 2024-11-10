@@ -1,10 +1,11 @@
 'use client'
 
 import React from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { useState } from 'react'
 
-export default function page() {
+export default function Page() {
   const [MoneyinvestedINR,setMoneyinvestedINR] = useState(500000)
   
   return (
@@ -12,7 +13,7 @@ export default function page() {
         <nav className="bg-gray-900 dark:bg-gray-900 fixed w-full z-20 top-0 start-0 border-b border-gray-200 dark:border-gray-600">
           <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
             <a href="http://localhost:3000" className="flex items-center space-x-3 rtl:space-x-reverse">
-              <img
+              <Image
                 src="/logo.png"
                 className="h-8"
                 alt="Flowbite Logo"

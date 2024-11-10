@@ -31,9 +31,9 @@ export default function Page() {
     );
     setActiveBoxes(newActiveBoxes);
     if (randombomb.includes(index)) {
-      let Betvalue:number=  Number (50000 - betvalue);
+      let Betvalue: number = 50000 - Number(betvalue);
       console.log(Betvalue);
-      alert(`'You hit a bomb! You lost.Currently u have ${kedk}'`);
+      alert(`'You hit a bomb! You lost.Currently u have ${Betvalue}'`);
     }
   };
 
@@ -103,13 +103,15 @@ export default function Page() {
                         <SelectTrigger id="framework">
                           <SelectValue placeholder="Select" />
                         </SelectTrigger>
-                        <SelectContent position="popper">
-                          {[...Array(24).keys()].map((num) => (
-                            <SelectItem key={num + 1} value={num + 1}>
-                              {num + 1}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
+                        <SelectTrigger>
+                          <SelectContent position="popper">
+                            {Array.from(Array(24).keys()).map((num) => (
+                              <SelectItem key={num + 1} value={String(num + 1)}>
+                                {num + 1}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </SelectTrigger>
                       </Select>
                     </div>
                   </div>
@@ -123,7 +125,7 @@ export default function Page() {
             </Card>
           </div>
         </div>
-          
+
         {bet && (
           <div className="grid grid-cols-5 gap-4">
             {activeBoxes.map((isActive, index) => (
