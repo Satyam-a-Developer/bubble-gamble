@@ -17,6 +17,9 @@ export default function Page() {
                 src="/logo.png"
                 className="h-8"
                 alt="Flowbite Logo"
+                width={100}
+                height={100}
+                
               />
               <span className="self-center text-[20px] font-semibold whitespace-nowrap dark:text-white">
                 Bubble Gamble

@@ -29,10 +29,10 @@ export default function CarouselDemo() {
         <Carousel className="w-[900px] ">
           <CarouselContent >
             <CarouselItem>
-              <Image src="/logo.png" className="rounded-lg w-[1200px] h-[600px]" alt="Image description" />
+              <Image src="/logo.png" className="rounded-lg w-[1200px] h-[600px]" alt="Image description" width={1200} height={600} />
             </CarouselItem>
             <CarouselItem>
-              <Image src="/logo.png" className="rounded-lg w-[1200px] h-[600px]" alt="Image description" />
+              <Image src="/logo.png" className="rounded-lg w-[1200px] h-[600px]" alt="Image description" width={1200} height={600} />
             </CarouselItem>
           </CarouselContent>
           <CarouselPrevious />

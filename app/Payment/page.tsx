@@ -1,6 +1,5 @@
 import React from "react";
-import Image from "next/image";
-
+import Image from "next/image"
 export default function Payment() {
   return (
     <div className="flex justify-center items-center h-svh bg-blue-gray-500 mt-[50px] gap-10 overflow-scroll ">
@@ -10,6 +9,9 @@ export default function Payment() {
             className="absolute inset-0 h-full w-full object-cover"
             src="/logo.png"
             alt="card-image"
+            width={1}
+            height={1}
+           
           />
         </div>
         <div className="p-6">
@@ -39,6 +41,8 @@ export default function Payment() {
             className="absolute inset-0 h-full w-full object-cover"
             src="/logo.png"
             alt="card-image"
+            width={1}
+            height={1}
           />
         </div>
         <div className="p-6">
