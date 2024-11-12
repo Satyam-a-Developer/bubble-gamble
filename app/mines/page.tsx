@@ -3,6 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import sound from "../../public/cinematic-boom-171285-[AudioTrimmer.com].mp3"
+import sound2 from "../../public/vine-boom-spam-sound-effect-205568-[AudioTrimmer.com].mp3"
 import {
   Select,
   SelectContent,
@@ -10,9 +12,27 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import React, { useState } from "react";
+import React, { useState , useRef , useEffect} from "react";
 
 export default function Page() {
+  const [isplaying, setisplaying] = useState(false);
+  const [isplaying2, setisplaying2] = useState(false);
+  const audioRef = useRef<HTMLAudioElement>(null);
+  const audioRef2 = useRef<HTMLAudioElement>(null);
+ 
+   useEffect(() => {
+    if (audioRef2.current) {
+      if (isplaying2) {
+
+        audioRef2.current.play();
+      } else {
+
+        audioRef2.current.pause();
+      }
+    }
+   
+  }, [isplaying2]);
+  
   const [randombomb, setRandomBomb] = useState<number[]>([]);
   const [betvalue, setbetvalue] = useState(" ");
   const [bet, setBet] = useState<boolean>(false);
@@ -24,10 +44,12 @@ export default function Page() {
   const handleClick = (button: "Manual" | "Auto") => {
     setActiveButton(button);
   };
-
   const handleBoxClick = (index: number) => {
     if (gameOver || activeBoxes[index]) return; // Prevent clicking if game is over or box is already revealed
-
+    setisplaying(!isplaying)
+      if (audioRef.current) {
+    audioRef.current.play(); // Play the first sound
+  }
     const newActiveBoxes = [...activeBoxes];
     newActiveBoxes[index] = true; // Only set to true, never back to false
     setActiveBoxes(newActiveBoxes);
@@ -40,6 +62,7 @@ export default function Page() {
         randombomb.includes(idx) ? true : newActiveBoxes[idx]
       );
       setActiveBoxes(finalReveal);
+      setisplaying2(!isplaying2)
       alert(`You hit a bomb! You lost. Currently you have ${Betvalue}`);
     }
   };
@@ -87,6 +110,10 @@ export default function Page() {
               >
                 Auto
               </button>
+              <button onClick={() => setisplaying(!isplaying)}>Play</button>
+              <button onClick={() => setisplaying2(!isplaying2)}>Play2</button>
+              <audio ref={audioRef} src={sound}></audio>
+              <audio ref={audioRef2} src={sound2}></audio>
             </div>
           </div>
 

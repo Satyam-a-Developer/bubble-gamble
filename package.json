@@ -31,7 +31,9 @@
     "react-spring": "^9.7.4",
     "recharts": "^2.12.7",
     "tailwind-merge": "^2.3.0",
-    "tailwindcss-animate": "^1.0.7"
+    "tailwindcss-animate": "^1.0.7",
+    "url-loader": "^4.1.1",
+    "use-sound": "^4.0.3"
   },
   "devDependencies": {
     "@types/matter-js": "^0.19.7",
