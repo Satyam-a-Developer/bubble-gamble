@@ -12,15 +12,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import React, { useState , useRef , useEffect} from "react";
+import React, { useState, useRef, useEffect } from "react";
 
 export default function Page() {
   const [isplaying, setisplaying] = useState(false);
   const [isplaying2, setisplaying2] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
   const audioRef2 = useRef<HTMLAudioElement>(null);
- 
-   useEffect(() => {
+
+  useEffect(() => {
     if (audioRef2.current) {
       if (isplaying2) {
 
@@ -30,9 +30,9 @@ export default function Page() {
         audioRef2.current.pause();
       }
     }
-   
+
   }, [isplaying2]);
-  
+
   const [randombomb, setRandomBomb] = useState<number[]>([]);
   const [betvalue, setbetvalue] = useState(" ");
   const [bet, setBet] = useState<boolean>(false);
@@ -47,9 +47,9 @@ export default function Page() {
   const handleBoxClick = (index: number) => {
     if (gameOver || activeBoxes[index]) return; // Prevent clicking if game is over or box is already revealed
     setisplaying(!isplaying)
-      if (audioRef.current) {
-    audioRef.current.play(); // Play the first sound
-  }
+    if (audioRef.current) {
+      audioRef.current.play(); // Play the first sound
+    }
     const newActiveBoxes = [...activeBoxes];
     newActiveBoxes[index] = true; // Only set to true, never back to false
     setActiveBoxes(newActiveBoxes);
@@ -94,8 +94,8 @@ export default function Page() {
             <div className="inline-flex rounded-md shadow-sm">
               <button
                 className={`px-4 py-2 text-sm font-medium rounded-l-lg ${activeButton === "Manual"
-                    ? "bg-slate-600 text-white"
-                    : "bg-white text-black"
+                  ? "bg-slate-600 text-white"
+                  : "bg-white text-black"
                   }`}
                 onClick={() => handleClick("Manual")}
               >
@@ -103,15 +103,13 @@ export default function Page() {
               </button>
               <button
                 className={`px-4 py-2 text-sm font-medium rounded-r-lg ${activeButton === "Auto"
-                    ? "bg-slate-600 text-white"
-                    : "bg-white text-black"
+                  ? "bg-slate-600 text-white"
+                  : "bg-white text-black"
                   }`}
                 onClick={() => handleClick("Auto")}
               >
                 Auto
               </button>
-              <button onClick={() => setisplaying(!isplaying)}>Play</button>
-              <button onClick={() => setisplaying2(!isplaying2)}>Play2</button>
               <audio ref={audioRef} src={sound}></audio>
               <audio ref={audioRef2} src={sound2}></audio>
             </div>
