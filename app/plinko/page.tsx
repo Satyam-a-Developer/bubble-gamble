@@ -15,6 +15,8 @@ interface Multipliers {
 
 const MatterScene = () => {
   const sceneRef = useRef<HTMLDivElement>(null);
+  const renderRef = useRef<Matter.Render | null>(null);
+  const runnerRef = useRef<Matter.Runner | null>(null);
   const [autoStopValue, setAutoStopValue] = useState<string>('');
   const [activeButton, setActiveButton] = useState<"Manual" | "Auto">("Manual");
   const engineRef = useRef<Matter.Engine | null>(null);
@@ -22,32 +24,37 @@ const MatterScene = () => {
   const [results, setResults] = useState<BallResult[]>([]);
   const [totalWinLoss, setTotalWinLoss] = useState<number>(0);
   const loggedBallIds = useRef<Set<number>>(new Set());
+  const [ballsDropped, setBallsDropped] = useState<number>(0);
 
- 
+  const multipliers: Multipliers = {
+    1: 0.5,
+    2: 0.75,
+    3: 0.9,
+    4: 1.5,
+    5: 0.9,
+    6: 0.75,
+    7: 0.5,
+    8: 1.2
+  };
+
+  const calculateWinLoss = (section: string, betAmount: number): { winAmount: number; isWin: boolean; multiplier: number } => {
+    const sectionNumber = parseInt(section.split(' ')[1]);
+    const multiplier = multipliers[sectionNumber] || 1;
+    const winAmount = betAmount * multiplier - betAmount;
+
+    return {
+      winAmount,
+      isWin: winAmount > 0,
+      multiplier
+    };
+  };
 
   useMemo(() => {
-    const multipliers: Multipliers = {
-      1: 0.5,
-      2: 0.75,
-      3: 0.9,
-      4: 1.5,
-      5: 0.9,
-      6: 0.75,
-      7: 0.5,
-      8: 1.2
-    };
-  
-    const calculateWinLoss = (section: string, betAmount: number): { winAmount: number; isWin: boolean; multiplier: number } => {
-      const sectionNumber = parseInt(section.split(' ')[1]);
-      const multiplier = multipliers[sectionNumber] || 1;
-      const winAmount = betAmount * multiplier - betAmount;
-  
-      return {
-        winAmount,
-        isWin: winAmount > 0,
-        multiplier
-      };
-    };
+    // Clear any existing render or scene
+    if (renderRef.current) {
+      Matter.Render.stop(renderRef.current);
+      renderRef.current.canvas.remove();
+    }
 
     if (!sceneRef.current) return;
 
@@ -67,6 +74,7 @@ const MatterScene = () => {
         background: 'black',
       },
     });
+    renderRef.current = render;
 
     const sectionWidth = 800 / 8;
     const sectionColors = [
@@ -170,18 +178,25 @@ const MatterScene = () => {
     Events.on(render, 'afterRender', handleRender);
 
     const runner = Matter.Runner.create();
+    runnerRef.current = runner;
     Matter.Runner.run(runner, engine);
     Matter.Render.run(render);
 
     return () => {
       Events.off(engine, 'collisionStart', handleCollision);
       Events.off(render, 'afterRender', handleRender);
-      Matter.Render.stop(render);
-      Matter.Runner.stop(runner);
+      
+      if (renderRef.current) {
+        Matter.Render.stop(renderRef.current);
+        renderRef.current.canvas.remove();
+      }
+      
+      if (runnerRef.current) {
+        Matter.Runner.stop(runnerRef.current);
+      }
+      
       World.clear(engine.world, true);
       Engine.clear(engine);
-      render.canvas.remove();
-      render.textures = {};
     };
   }, [betValue]);
 
@@ -217,6 +232,7 @@ const MatterScene = () => {
       });
 
       World.add(engineRef.current.world, ball);
+      setBallsDropped(prev => prev + 1);
     }
   };
 
@@ -247,6 +263,22 @@ const MatterScene = () => {
     });
 
     World.add(engineRef.current.world, ball);
+    setBallsDropped(prev => prev + 1);
+
+    if (activeButton === "Auto" && autoStopValue) {
+      const count = parseInt(autoStopValue);
+      if (ballsDropped + 1 >= count) {
+        // Reset balls dropped when auto stop is reached
+        setBallsDropped(0);
+      }
+    }
+  };
+
+  const resetGame = (): void => {
+    setResults([]);
+    setTotalWinLoss(0);
+    setBallsDropped(0);
+    loggedBallIds.current.clear();
   };
 
   return (
@@ -304,20 +336,42 @@ const MatterScene = () => {
         <div className="mb-5">
           Total Win/Loss: {totalWinLoss >= 0 ? '+' : ''}{totalWinLoss.toFixed(2)}
         </div>
-        <button
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-          onClick={dropBall}
-        >
-          Start Game
-        </button>
-        {activeButton === "Auto" && (
+        <div className="flex gap-4">
           <button
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ml-7"
-            onClick={autoDropBallsStop}
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            onClick={dropBall}
           >
-            Stop Game
+            Start Game
           </button>
-        )}
+          {activeButton === "Auto" && (
+            <button
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+              onClick={autoDropBallsStop}
+            >
+              Stop Game
+            </button>
+          )}
+          <button
+            className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+            onClick={resetGame}
+          >
+            Reset
+          </button>
+        </div>
+
+        <div className="mt-5">
+          <h3 className="font-bold">Recent Results:</h3>
+          <div className="max-h-[200px] overflow-y-auto w-[100]">
+            {results.slice(-10).map((result, index) => (
+              <div 
+                key={index} 
+                className={`p-2 ${result.isWin ? 'bg-green-900' : 'bg-red-900'}`}
+              >
+                {result.result} - {result.isWin ? '+' : ''}{result.winAmount.toFixed(2)}
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
       <div ref={sceneRef} />
     </div>
