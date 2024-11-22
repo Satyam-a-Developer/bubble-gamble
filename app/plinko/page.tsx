@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import Matter, { Engine, World, Bodies, Events, IEventCollision } from 'matter-js';
 
 interface BallResult {
@@ -23,30 +23,32 @@ const MatterScene = () => {
   const [totalWinLoss, setTotalWinLoss] = useState<number>(0);
   const loggedBallIds = useRef<Set<number>>(new Set());
 
-  const multipliers: Multipliers = {
-    1: 0.5,
-    2: 0.75,
-    3: 0.9,
-    4: 1.5,
-    5: 0.9,
-    6: 0.75,
-    7: 0.5,
-    8: 1.2
-  };
+ 
 
-  const calculateWinLoss = (section: string, betAmount: number): { winAmount: number; isWin: boolean; multiplier: number } => {
-    const sectionNumber = parseInt(section.split(' ')[1]);
-    const multiplier = multipliers[sectionNumber] || 1;
-    const winAmount = betAmount * multiplier - betAmount;
-
-    return {
-      winAmount,
-      isWin: winAmount > 0,
-      multiplier
+  useMemo(() => {
+    const multipliers: Multipliers = {
+      1: 0.5,
+      2: 0.75,
+      3: 0.9,
+      4: 1.5,
+      5: 0.9,
+      6: 0.75,
+      7: 0.5,
+      8: 1.2
     };
-  };
+  
+    const calculateWinLoss = (section: string, betAmount: number): { winAmount: number; isWin: boolean; multiplier: number } => {
+      const sectionNumber = parseInt(section.split(' ')[1]);
+      const multiplier = multipliers[sectionNumber] || 1;
+      const winAmount = betAmount * multiplier - betAmount;
+  
+      return {
+        winAmount,
+        isWin: winAmount > 0,
+        multiplier
+      };
+    };
 
-  useEffect(() => {
     if (!sceneRef.current) return;
 
     const engine = Engine.create({
