@@ -1,188 +1,323 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
-import Matter, { Engine, World, Render, Bodies, Events, Runner, Body } from 'matter-js';
+import Matter, { Engine, World, Bodies, Events, IEventCollision } from 'matter-js';
 
 interface BallResult {
   ballId: number;
   result: string;
+  winAmount: number;
+  isWin: boolean;
+}
+
+interface Multipliers {
+  [key: number]: number;
 }
 
 const MatterScene = () => {
-  const sceneRef = useRef<HTMLDivElement | null>(null);
+  const sceneRef = useRef<HTMLDivElement>(null);
+  const [autoStopValue, setAutoStopValue] = useState<string>('');
+  const [activeButton, setActiveButton] = useState<"Manual" | "Auto">("Manual");
+  const engineRef = useRef<Matter.Engine | null>(null);
   const [betValue, setBetValue] = useState<string>('');
-  const [stopValue, setStopValue] = useState<string>('');
-  const [dropCount, setDropCount] = useState<number>(0);
   const [results, setResults] = useState<BallResult[]>([]);
-  const [engine, setEngine] = useState<Engine | null>(null);
-  const loggedBallIds = useRef<Set<number>>(new Set()); // Track processed balls
+  const [totalWinLoss, setTotalWinLoss] = useState<number>(0);
+  const loggedBallIds = useRef<Set<number>>(new Set());
+
+  const multipliers: Multipliers = {
+    1: 0.5,
+    2: 0.75,
+    3: 0.9,
+    4: 1.5,
+    5: 0.9,
+    6: 0.75,
+    7: 0.5,
+    8: 1.2
+  };
+
+  const calculateWinLoss = (section: string, betAmount: number): { winAmount: number; isWin: boolean; multiplier: number } => {
+    const sectionNumber = parseInt(section.split(' ')[1]);
+    const multiplier = multipliers[sectionNumber] || 1;
+    const winAmount = betAmount * multiplier - betAmount;
+
+    return {
+      winAmount,
+      isWin: winAmount > 0,
+      multiplier
+    };
+  };
 
   useEffect(() => {
-    // Create an engine and a renderer
-    const newEngine = Matter.Engine.create();
-    setEngine(newEngine);
-    const { world } = newEngine;
+    if (!sceneRef.current) return;
 
-    if (sceneRef.current) {
-      const render = Matter.Render.create({
-        element: sceneRef.current,
-        engine: newEngine,
-        options: {
-          width: 800,
-          height: 600,
-          wireframes: false,
-          background: 'black',
-        },
-      });
+    const engine = Engine.create({
+      enableSleeping: false,
+      gravity: { x: 0, y: 2, scale: 0.002 }
+    });
+    engineRef.current = engine;
 
-      // Create the ground sections
-      const groundSections: Matter.Body[] = [];
-      const sectionWidth = 800 / 7; // Divide the width into 7 parts
+    const render = Matter.Render.create({
+      element: sceneRef.current,
+      engine: engine,
+      options: {
+        width: 800,
+        height: 600,
+        wireframes: false,
+        background: 'black',
+      },
+    });
 
-      for (let i = 0; i < 7; i++) {
-        const section = Matter.Bodies.rectangle(
-          sectionWidth / 2 + i * sectionWidth, // X position
-          580, // Y position
-          sectionWidth, // Width
-          20, // Height
-          {
-            isStatic: false,
-            friction: 0,
-            label: `Section ${i + 1}`,
-            render: { fillStyle: '#95a5a6' },
-            restitution: 0,
-          }
-        );
-        groundSections.push(section);
+    const sectionWidth = 800 / 8;
+    const sectionColors = [
+      '#FF0000', '#FFA500', '#FFFF00', '#00FF00',
+      '#0000FF', '#4B0082', '#8B00FF', '#FF69B4'
+    ];
+
+    const groundSections = sectionColors.map((color, i) =>
+      Bodies.rectangle(
+        sectionWidth / 2 + i * sectionWidth,
+        580,
+        sectionWidth,
+        20,
+        {
+          isStatic: true,
+          friction: 0.5,
+          label: `Section ${i + 1}`,
+          render: { fillStyle: color },
+          restitution: 0.3,
+        }
+      )
+    );
+
+    const createPlinkoPegs = (): Matter.Body[] => {
+      const pegs: Matter.Body[] = [];
+      const rows = 10;
+      const pegRadius = 5;
+      const spacing = 60;
+
+      for (let row = 0; row < rows; row++) {
+        for (let col = 0; col <= row; col++) {
+          pegs.push(
+            Bodies.circle(
+              400 - (row * spacing) / 2 + col * spacing,
+              100 + row * spacing,
+              pegRadius,
+              {
+                isStatic: true,
+                render: { fillStyle: '#3498db' },
+                friction: 0.2,
+                restitution: 0.6,
+              }
+            )
+          );
+        }
       }
 
-      // Create a function to generate a Plinko-style grid of pegs
-      const createPlinkoPegs = () => {
-        const pegs: Matter.Body[] = [];
-        const rows = 10; // Number of rows in the triangle
-        const pegRadius = 5; // Radius of each peg
-        const spacing = 60; // Space between pegs
+      return pegs;
+    };
 
-        // Generate the pegs in a triangular pattern
-        for (let row = 0; row < rows; row++) {
-          for (let col = 0; col <= row; col++) {
-            const x = 400 - (row * spacing) / 2 + col * spacing;
-            const y = 100 + row * spacing;
-            const peg = Matter.Bodies.circle(x, y, pegRadius, {
-              isStatic: true,
-              render: { fillStyle: '#3498db' },
-            });
-            pegs.push(peg);
-          }
-        }
+    World.add(engine.world, [...createPlinkoPegs(), ...groundSections]);
 
-        return pegs;
-      };
-
-      // Create the Plinko pegs
-      const pegs = createPlinkoPegs();
-
-      // Add all bodies to the world
-      Matter.World.add(world, [...pegs, ...groundSections]);
-
-      // Run the engine
-      const runner = Matter.Runner.create();
-      Matter.Runner.run(runner, newEngine);
-
-      // Animation loop for smooth rendering
-      const animate = () => {
-        Matter.Engine.update(newEngine);
-        render.canvas.width = render.canvas.width; // Clear the canvas
-        Matter.Render.world(render); // Render the updated world
-        requestAnimationFrame(animate);
-      };
-      requestAnimationFrame(animate);
-
-      // Cleanup on component unmount
-      return () => {
-        Matter.Render.stop(render);
-        Matter.Runner.stop(runner);
-        Matter.World.clear(world, true); // Clear all bodies and constraints
-        Matter.Engine.clear(newEngine);
-        render.canvas.remove();
-        render.textures = {};
-      };
-    }
-  }, []);
-
-  // Function to create and drop a new ball
-  const dropBall = () => {
-    if (!engine) return;
-
-    const { world } = engine;
-    const randomX = Math.floor(Math.random() * (410 - 390 + 1)) + 390; // Random X position between 390 and 410
-    const ball = Matter.Bodies.circle(randomX, 50, 10, {
-      restitution: 0.8, // Bounciness
-      render: { fillStyle: '#e74c3c' },
-    });
-
-    Matter.World.add(world, ball);
-    setDropCount((prev) => prev + 1);
-
-    // Collision detection for the new ball
-    Matter.Events.on(engine, 'collisionStart', (event) => {
+    const handleCollision = (event: IEventCollision<Matter.Engine>): void => {
       event.pairs.forEach((pair) => {
         const { bodyA, bodyB } = pair;
-        if (bodyA.label.startsWith('Section') || bodyB.label.startsWith('Section')) {
-          const sectionLabel = bodyA.label.startsWith('Section') ? bodyA.label : bodyB.label;
+        const sectionBody = bodyA.label.startsWith('Section') ? bodyA :
+          bodyB.label.startsWith('Section') ? bodyB : null;
 
-          // Track the ball's result only if it hasn't been processed before
-          if (bodyA === ball || bodyB === ball) {
-            if (!loggedBallIds.current.has(ball.id)) {
-              const ballResult: BallResult = {
-                ballId: ball.id, // Ball's unique ID
-                result: sectionLabel,
-              };
+        const ball = bodyA.label.startsWith('Section') ? bodyB : bodyA;
 
-              setResults((prev) => [...prev, ballResult]); // Update results with the ball's final section
-              loggedBallIds.current.add(ball.id); // Mark ball as processed
-            }
-          }
+        if (sectionBody && !loggedBallIds.current.has(ball.id)) {
+          const { winAmount, isWin } = calculateWinLoss(sectionBody.label, Number(betValue));
+
+          setResults(prev => [...prev, {
+            ballId: ball.id,
+            result: sectionBody.label,
+            winAmount,
+            isWin
+          }]);
+
+          setTotalWinLoss(prev => prev + winAmount);
+          loggedBallIds.current.add(ball.id);
+
+          setTimeout(() => {
+            World.remove(engine.world, ball);
+          }, 1000);
         }
       });
+    };
+
+    Events.on(engine, 'collisionStart', handleCollision);
+
+    const handleRender = (): void => {
+      const ctx = render.context;
+      if (!ctx) return;
+
+      ctx.textAlign = 'center';
+      ctx.font = 'bold 20px Arial';
+      ctx.fillStyle = 'white';
+
+      Object.entries(multipliers).forEach(([section, multiplier]) => {
+        const sectionIndex = parseInt(section) - 1;
+        const x = sectionWidth / 2 + sectionIndex * sectionWidth;
+        ctx.fillText(`${multiplier}x`, x, 550);
+      });
+
+      ctx.font = 'bold 24px Arial';
+      ctx.fillText('PLINKO', 400, 40);
+    };
+
+    Events.on(render, 'afterRender', handleRender);
+
+    const runner = Matter.Runner.create();
+    Matter.Runner.run(runner, engine);
+    Matter.Render.run(render);
+
+    return () => {
+      Events.off(engine, 'collisionStart', handleCollision);
+      Events.off(render, 'afterRender', handleRender);
+      Matter.Render.stop(render);
+      Matter.Runner.stop(runner);
+      World.clear(engine.world, true);
+      Engine.clear(engine);
+      render.canvas.remove();
+      render.textures = {};
+    };
+  }, [betValue]);
+
+  const handleClick = (button: "Manual" | "Auto"): void => {
+    setActiveButton(button);
+  };
+
+  const autoDropBallsStop = (): void => {
+    if (!engineRef.current) return;
+
+    const count = parseInt(autoStopValue);
+    if (isNaN(count) || count <= 0) return;
+
+    for (let i = 0; i < count; i++) {
+      const ball = Bodies.circle(
+        Math.floor(Math.random() * (410 - 390 + 1)) + 390,
+        50,
+        10,
+        {
+          restitution: 0.5,
+          friction: 0.002,
+          density: 0.002,
+          render: { fillStyle: '#FFFFFF' },
+          collisionFilter: {
+            category: 0x0002,
+          },
+        }
+      );
+
+      Matter.Body.setVelocity(ball, {
+        x: 0,
+        y: 5
+      });
+
+      World.add(engineRef.current.world, ball);
+    }
+  };
+
+  const dropBall = (): void => {
+    if (!engineRef.current || !betValue) return;
+
+    const currentBet = Number(betValue);
+    if (isNaN(currentBet) || currentBet <= 0) return;
+
+    const ball = Bodies.circle(
+      Math.floor(Math.random() * (410 - 390 + 1)) + 390,
+      50,
+      10,
+      {
+        restitution: 0.5,
+        friction: 0.002,
+        density: 0.002,
+        render: { fillStyle: '#FFFFFF' },
+        collisionFilter: {
+          category: 0x0002,
+        },
+      }
+    );
+
+    Matter.Body.setVelocity(ball, {
+      x: 0,
+      y: 5
     });
+
+    World.add(engineRef.current.world, ball);
   };
 
   return (
-    <div style={{ textAlign: 'center', marginTop: '20px', backgroundColor: 'black', color: '#fff' }}>
-      <div className="flex justify-center items-center h-svh bg-blue-gray-500 mt-[50px] gap-10 overflow-scroll">
-        <div className="bg-slate-600 p-11 rounded-lg">
-          <div className="flex flex-col gap-7 mb-10">
-            <label>Bet Value</label>
-            <input
-              type="number"
-              style={{ border: '3px solid black', width: '300px', height: '50px', color: 'red' }}
-              onChange={(e) => setBetValue(e.target.value)}
-            />
-            <label>Stop Value</label>
-            <input
-              type="number"
-              style={{ border: '3px solid black', width: '300px', height: '50px' , color: 'red' }}
-              value={stopValue}
-              onChange={(e) => setStopValue(e.target.value)}
-            />
-          </div>
-          <button
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-            onClick={dropBall}
-          >
-            Start Game
-          </button>
-        </div>
-        <div style={{ marginTop: '20px', color: '#fff', overflow: 'scroll', width: '100%', height: '500px' }}>
-          <h3>Results:</h3>
-          {results.map((result, index) => (
-            <div key={index}>
-              Ball {result.ballId} landed in {result.result}
+    <div className="flex justify-center items-center h-svh bg-blue-gray-500 mt-[50px] gap-10 overflow-scroll">
+      <div className="bg-slate-600 p-11 rounded-lg">
+        <div className="flex flex-col gap-7 mb-10">
+          <div className="flex justify-center mb-6">
+            <div className="inline-flex rounded-md shadow-sm">
+              <button
+                className={`px-4 py-2 text-sm font-medium rounded-l-lg ${
+                  activeButton === "Manual"
+                    ? "bg-red-300 text-white"
+                    : "bg-white text-black"
+                }`}
+                onClick={() => handleClick("Manual")}
+              >
+                Manual
+              </button>
+              <button
+                className={`px-4 py-2 text-sm font-medium rounded-r-lg ${
+                  activeButton === "Auto"
+                    ? "bg-red-300 text-white"
+                    : "bg-white text-black"
+                }`}
+                onClick={() => handleClick("Auto")}
+              >
+                Auto
+              </button>
             </div>
-          ))}
+          </div>
+
+          <label>Bet Value</label>
+          <input
+            type="number"
+            className="border-3 border-black w-[300px] h-[50px] text-red-500"
+            value={betValue}
+            onChange={(e) => setBetValue(e.target.value)}
+          />
         </div>
-        <div ref={sceneRef} />
+
+        {activeButton === "Auto" && (
+          <>
+            <label>Stop value:</label>
+            <br />
+            (It will stop when the ball hits the stop value)
+            <br />
+            <input
+              type="number"
+              className="border-3 border-black w-[300px] h-[50px] text-red-500"
+              value={autoStopValue}
+              onChange={(e) => setAutoStopValue(e.target.value)}
+            />
+          </>
+        )}
+        <div className="mb-5">
+          Total Win/Loss: {totalWinLoss >= 0 ? '+' : ''}{totalWinLoss.toFixed(2)}
+        </div>
+        <button
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          onClick={dropBall}
+        >
+          Start Game
+        </button>
+        {activeButton === "Auto" && (
+          <button
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ml-7"
+            onClick={autoDropBallsStop}
+          >
+            Stop Game
+          </button>
+        )}
       </div>
+      <div ref={sceneRef} />
     </div>
   );
 };
