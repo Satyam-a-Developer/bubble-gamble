@@ -1,7 +1,7 @@
 'use client';
 import { useMemo, useRef, useState } from 'react';
 import Matter, { Engine, World, Bodies, Events, IEventCollision } from 'matter-js';
-import SectionProfitLineGraph from '../Graph/page';
+import SectionProfitFooterChart from '../Graph/page';
 
 interface BallResult {
   ballId: number;
@@ -284,18 +284,15 @@ const MatterScene = () => {
 
   return (
     <div className="flex justify-center items-center h-svh bg-blue-gray-500 mt-[50px] gap-10 overflow-scroll">
-  <SectionProfitLineGraph 
-    results={results} 
-    multipliers={multipliers} 
-  />
+
       <div className="bg-slate-600 p-11 rounded-lg">
         <div className="flex flex-col gap-7 mb-10">
           <div className="flex justify-center mb-6">
             <div className="inline-flex rounded-md shadow-sm">
               <button
                 className={`px-4 py-2 text-sm font-medium rounded-l-lg ${activeButton === "Manual"
-                    ? "bg-red-300 text-white"
-                    : "bg-white text-black"
+                  ? "bg-red-300 text-white"
+                  : "bg-white text-black"
                   }`}
                 onClick={() => handleClick("Manual")}
               >
@@ -303,8 +300,8 @@ const MatterScene = () => {
               </button>
               <button
                 className={`px-4 py-2 text-sm font-medium rounded-r-lg ${activeButton === "Auto"
-                    ? "bg-red-300 text-white"
-                    : "bg-white text-black"
+                  ? "bg-red-300 text-white"
+                  : "bg-white text-black"
                   }`}
                 onClick={() => handleClick("Auto")}
               >
@@ -362,12 +359,25 @@ const MatterScene = () => {
           </button>
         </div>
 
-       
-        
+        <div className="mt-5">
+          <h3 className="font-bold">Recent Results:</h3>
+          <div className="max-h-[200px] overflow-y-auto w-[100]">
+            {results.slice(-10).map((result, index) => (
+              <div
+                key={index}
+                className={`p-2 ${result.isWin ? 'bg-green-900' : 'bg-red-900'}`}
+              >
+                {result.result} - {result.isWin ? '+' : ''}{result.winAmount.toFixed(2)}
+              </div>
+            ))}
+
+          </div>
+        </div>
+
       </div>
       <div ref={sceneRef} />
 
-  
+
     </div>
   );
 };
