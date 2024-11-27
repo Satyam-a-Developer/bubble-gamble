@@ -18,6 +18,7 @@ export default function Page() {
   const [isplaying, setisplaying] = useState(false);
   const [isplaying2, setisplaying2] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
+  const [miensclicked, setMienClicked] = useState(0);
   const audioRef2 = useRef<HTMLAudioElement>(null);
 
   useEffect(() => {
@@ -44,9 +45,13 @@ export default function Page() {
   const handleClick = (button: "Manual" | "Auto") => {
     setActiveButton(button);
   };
+ 
+ 
   const handleBoxClick = (index: number) => {
     if (gameOver || activeBoxes[index]) return; // Prevent clicking if game is over or box is already revealed
+    setMienClicked((prev) => prev + 1) 
     setisplaying(!isplaying)
+    console.log(miensclicked)
     if (audioRef.current) {
       audioRef.current.play(); // Play the first sound
     }

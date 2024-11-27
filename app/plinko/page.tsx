@@ -26,6 +26,7 @@ const MatterScene = () => {
   const [totalWinLoss, setTotalWinLoss] = useState<number>(0);
   const loggedBallIds = useRef<Set<number>>(new Set());
   const [ballsDropped, setBallsDropped] = useState<number>(0);
+  const autoDropTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const multipliers: Multipliers = {
     1: 0.5,
@@ -61,7 +62,7 @@ const MatterScene = () => {
 
     const engine = Engine.create({
       enableSleeping: false,
-      gravity: { x: 0, y: 2, scale: 0.002 }
+      gravity: { x: 0, y: 2, scale: 0.002 } // Reduced gravity scale
     });
     engineRef.current = engine;
 
@@ -115,8 +116,8 @@ const MatterScene = () => {
               {
                 isStatic: true,
                 render: { fillStyle: '#3498db' },
-                friction: 0.2,
-                restitution: 0.6,
+                friction: 0.3, // Increased friction
+                restitution: 0.4, // Reduced bounciness
               }
             )
           );
@@ -184,6 +185,9 @@ const MatterScene = () => {
     Matter.Render.run(render);
 
     return () => {
+      if (autoDropTimeoutRef.current) {
+        clearTimeout(autoDropTimeoutRef.current);
+      }
       Events.off(engine, 'collisionStart', handleCollision);
       Events.off(render, 'afterRender', handleRender);
 
@@ -202,39 +206,64 @@ const MatterScene = () => {
   }, [betValue]);
 
   const handleClick = (button: "Manual" | "Auto"): void => {
+    if (autoDropTimeoutRef.current) {
+      clearTimeout(autoDropTimeoutRef.current);
+    }
     setActiveButton(button);
   };
 
-  const autoDropBallsStop = (): void => {
+  const createSlowerBall = () => {
+    if (!engineRef.current) return null;
+    
+    return Bodies.circle(
+      Math.floor(Math.random() * (410 - 390 + 1)) + 390,
+      50,
+      10,
+      {
+        restitution: 0.3, // Reduced bounciness
+        friction: 0.005, // Increased friction
+        density: 0.003, // Slightly increased density
+        render: { fillStyle: '#FFFFFF' },
+        collisionFilter: {
+          category: 0x0002,
+        },
+      }
+    );
+  };
+
+  const autoDropBallsStop = async (): Promise<void> => {
     if (!engineRef.current) return;
 
     const count = parseInt(autoStopValue);
     if (isNaN(count) || count <= 0) return;
 
-    for (let i = 0; i < count; i++) {
-      const ball = Bodies.circle(
-        Math.floor(Math.random() * (410 - 390 + 1)) + 390,
-        50,
-        10,
-        {
-          restitution: 0.5,
-          friction: 0.002,
-          density: 0.002,
-          render: { fillStyle: '#FFFFFF' },
-          collisionFilter: {
-            category: 0x0002,
-          },
+    let ballsLeft = count;
+
+    const dropNextBall = () => {
+      if (ballsLeft <= 0) {
+        if (autoDropTimeoutRef.current) {
+          clearTimeout(autoDropTimeoutRef.current);
         }
-      );
+        return;
+      }
+
+      const ball = createSlowerBall();
+      if (!ball || !engineRef.current) return;
 
       Matter.Body.setVelocity(ball, {
         x: 0,
-        y: 5
+        y: 3 // Reduced initial velocity
       });
 
       World.add(engineRef.current.world, ball);
       setBallsDropped(prev => prev + 1);
-    }
+      ballsLeft--;
+
+      // Schedule next ball drop with longer delay
+      autoDropTimeoutRef.current = setTimeout(dropNextBall, 2000); // 2 second delay between balls
+    };
+
+    dropNextBall();
   };
 
   const dropBall = (): void => {
@@ -243,24 +272,12 @@ const MatterScene = () => {
     const currentBet = Number(betValue);
     if (isNaN(currentBet) || currentBet <= 0) return;
 
-    const ball = Bodies.circle(
-      Math.floor(Math.random() * (410 - 390 + 1)) + 390,
-      50,
-      10,
-      {
-        restitution: 0.5,
-        friction: 0.002,
-        density: 0.002,
-        render: { fillStyle: '#FFFFFF' },
-        collisionFilter: {
-          category: 0x0002,
-        },
-      }
-    );
+    const ball = createSlowerBall();
+    if (!ball) return;
 
     Matter.Body.setVelocity(ball, {
       x: 0,
-      y: 5
+      y: 3
     });
 
     World.add(engineRef.current.world, ball);
@@ -269,13 +286,15 @@ const MatterScene = () => {
     if (activeButton === "Auto" && autoStopValue) {
       const count = parseInt(autoStopValue);
       if (ballsDropped + 1 >= count) {
-        // Reset balls dropped when auto stop is reached
         setBallsDropped(0);
       }
     }
   };
 
   const resetGame = (): void => {
+    if (autoDropTimeoutRef.current) {
+      clearTimeout(autoDropTimeoutRef.current);
+    }
     setResults([]);
     setTotalWinLoss(0);
     setBallsDropped(0);
@@ -284,7 +303,6 @@ const MatterScene = () => {
 
   return (
     <div className="flex justify-center items-center h-svh bg-blue-gray-500 mt-[50px] gap-10 overflow-scroll">
-
       <div className="bg-slate-600 p-11 rounded-lg">
         <div className="flex flex-col gap-7 mb-10">
           <div className="flex justify-center mb-6">
@@ -370,14 +388,10 @@ const MatterScene = () => {
                 {result.result} - {result.isWin ? '+' : ''}{result.winAmount.toFixed(2)}
               </div>
             ))}
-
           </div>
         </div>
-
       </div>
       <div ref={sceneRef} />
-
-
     </div>
   );
 };
