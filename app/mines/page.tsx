@@ -2,9 +2,10 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import axios from "axios";
 import { Label } from "@/components/ui/label";
-import sound from "../../public/cinematic-boom-171285-[AudioTrimmer.com].mp3"
-import sound2 from "../../public/vine-boom-spam-sound-effect-205568-[AudioTrimmer.com].mp3"
+import sound from "../../public/cinematic-boom-171285-[AudioTrimmer.com].mp3";
+import sound2 from "../../public/vine-boom-spam-sound-effect-205568-[AudioTrimmer.com].mp3";
 import {
   Select,
   SelectContent,
@@ -21,43 +22,52 @@ export default function Page() {
   const [miensclicked, setMienClicked] = useState(0);
   const audioRef2 = useRef<HTMLAudioElement>(null);
 
+  const sendData = async (Betvalue) => {
+    try {
+      const response = await axios.post("http://localhost:3000/send-data", {
+        Betvalue,
+      });
+      console.log("Response from backend:", response.data);
+    } catch (error) {
+      console.error("Error sending data:", error.response?.data || error.message);
+    }
+  };
+
   const Cashout = () => {
     if (miensclicked) {
       const wining = Number(betvalue) * Number(miensclicked);
-     console.log(wining);
+      console.log(wining);
     }
   };
 
   useEffect(() => {
     if (audioRef2.current) {
       if (isplaying2) {
-
         audioRef2.current.play();
       } else {
-
         audioRef2.current.pause();
       }
     }
-
   }, [isplaying2]);
 
   const [randombomb, setRandomBomb] = useState<number[]>([]);
   const [betvalue, setbetvalue] = useState(" ");
   const [bet, setBet] = useState<boolean>(false);
   const [activeButton, setActiveButton] = useState<"Manual" | "Auto">("Manual");
-  const [activeBoxes, setActiveBoxes] = useState<boolean[]>(Array(25).fill(false));
+  const [activeBoxes, setActiveBoxes] = useState<boolean[]>(
+    Array(25).fill(false)
+  );
   const [mines, setMines] = useState<number>(1);
   const [gameOver, setGameOver] = useState<boolean>(false);
 
   const handleClick = (button: "Manual" | "Auto") => {
     setActiveButton(button);
   };
- 
- 
+
   const handleBoxClick = (index: number) => {
     if (gameOver || activeBoxes[index]) return; // Prevent clicking if game is over or box is already revealed
-    setMienClicked((prev) => prev + 1) 
-    setisplaying(!isplaying)
+    setMienClicked((prev) => prev + 1);
+    setisplaying(!isplaying);
     if (audioRef.current) {
       audioRef.current.play(); // Play the first sound
     }
@@ -73,8 +83,9 @@ export default function Page() {
         randombomb.includes(idx) ? true : newActiveBoxes[idx]
       );
       setActiveBoxes(finalReveal);
-      setisplaying2(!isplaying2)
+      setisplaying2(!isplaying2);
       alert(`You hit a bomb! You lost. Currently you have ${Betvalue}`);
+      sendData(Betvalue);
     }
   };
 
@@ -95,8 +106,7 @@ export default function Page() {
   };
 
   return (
-
-    <div className=" mt-10 w-full p-4 md:p-8 lg:p-12  h-[90vh]">
+    <div className=" mt-20 w-full p-4 md:p-8 lg:p-12  h-[90vh]">
       <div className="w-full max-w-7xl mx-auto bg-slate-50 flex flex-col lg:flex-row rounded-lg overflow-hidden">
         {/* Controls Panel */}
         <div className="w-full lg:w-[350px] bg-slate-400 p-4">
@@ -104,19 +114,21 @@ export default function Page() {
           <div className="flex justify-center mb-6">
             <div className="inline-flex rounded-md shadow-sm">
               <button
-                className={`px-4 py-2 text-sm font-medium rounded-l-lg ${activeButton === "Manual"
-                  ? "bg-slate-600 text-white"
-                  : "bg-white text-black"
-                  }`}
+                className={`px-4 py-2 text-sm font-medium rounded-l-lg ${
+                  activeButton === "Manual"
+                    ? "bg-slate-600 text-white"
+                    : "bg-white text-black"
+                }`}
                 onClick={() => handleClick("Manual")}
               >
                 Manual
               </button>
               <button
-                className={`px-4 py-2 text-sm font-medium rounded-r-lg ${activeButton === "Auto"
-                  ? "bg-slate-600 text-white"
-                  : "bg-white text-black"
-                  }`}
+                className={`px-4 py-2 text-sm font-medium rounded-r-lg ${
+                  activeButton === "Auto"
+                    ? "bg-slate-600 text-white"
+                    : "bg-white text-black"
+                }`}
                 onClick={() => handleClick("Auto")}
               >
                 Auto
@@ -166,13 +178,15 @@ export default function Page() {
               >
                 Bet
               </Button>
-              <Button
-                variant="outline"
-                onClick={Cashout}
-                className="w-full md:w-auto"
-              >
-                Cashout
-              </Button>
+              {bet && (
+                <Button
+                  variant="outline"
+                  onClick={Cashout}
+                  className="w-full ml-10 md:w-auto"
+                >
+                  Cashout
+                </Button>
+              )}
             </CardFooter>
           </Card>
         </div>
@@ -205,5 +219,3 @@ export default function Page() {
     </div>
   );
 }
-
-
