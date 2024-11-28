@@ -23,7 +23,7 @@ export default function Page() {
 
   const Cashout = () => {
     if (miensclicked) {
-     const wining = betvalue * miensclicked;
+      const wining = Number(betvalue) * Number(miensclicked);
      console.log(wining);
     }
   };
