@@ -21,6 +21,13 @@ export default function Page() {
   const [miensclicked, setMienClicked] = useState(0);
   const audioRef2 = useRef<HTMLAudioElement>(null);
 
+  const Cashout = () => {
+    if (miensclicked) {
+     const wining = betvalue * miensclicked;
+     console.log(wining);
+    }
+  };
+
   useEffect(() => {
     if (audioRef2.current) {
       if (isplaying2) {
@@ -51,7 +58,6 @@ export default function Page() {
     if (gameOver || activeBoxes[index]) return; // Prevent clicking if game is over or box is already revealed
     setMienClicked((prev) => prev + 1) 
     setisplaying(!isplaying)
-    console.log(miensclicked)
     if (audioRef.current) {
       audioRef.current.play(); // Play the first sound
     }
@@ -159,6 +165,13 @@ export default function Page() {
                 className="w-full md:w-auto"
               >
                 Bet
+              </Button>
+              <Button
+                variant="outline"
+                onClick={Cashout}
+                className="w-full md:w-auto"
+              >
+                Cashout
               </Button>
             </CardFooter>
           </Card>
