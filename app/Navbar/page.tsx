@@ -6,23 +6,7 @@ import Link from 'next/link'
 import axios from 'axios'
 
 export default function Page() {
-  const [MoneyinvestedINR, setMoneyinvestedINR] = useState(0);
-
-  const fetchNumber = async () => {
-    try {
-      const response = await axios.get("http://localhost:3000/number");
-      setMoneyinvestedINR(response.data.number);
-      console.log("Received number:", response.data.number);
-    } catch (error) {
-      console.error("Error fetching the number:", error);
-    }
-  };
-
-  // Fetch the number when the component mounts
-  useEffect(() => {
-    fetchNumber();
-  }, []); // Empty dependency array ensures it runs only once
-
+  const [MoneyinvestedINR, setMoneyinvestedINR] = useState(50000);
   return (
     <div>
       <nav className="bg-gray-900 dark:bg-gray-900 fixed w-full z-20 top-0 start-0 border-b border-gray-200 dark:border-gray-600">

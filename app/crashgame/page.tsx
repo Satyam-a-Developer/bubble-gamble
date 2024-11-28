@@ -91,12 +91,18 @@ export default function CrashGame() {
               onChange={(e) => setStopValue(e.target.value)}
             />
           </div>
-          <button
-            onClick={startGame}
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-          >
-            Start Game
-          </button>
+          {
+            Number(betValue) > 0  && Number(stopValue) > 0 && 
+            (
+              <button
+              onClick={startGame}
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            >
+              Start Game
+            </button>
+            )
+          }
+        
         </div>
         <canvas ref={canvasRef} width={500} height={500} style={{ backgroundColor: 'black' }} />
       </div>

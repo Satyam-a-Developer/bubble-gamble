@@ -114,6 +114,7 @@ const MatterScene = () => {
               100 + row * spacing,
               pegRadius,
               {
+                
                 isStatic: true,
                 render: { fillStyle: '#3498db' },
                 friction: 0.3, // Increased friction

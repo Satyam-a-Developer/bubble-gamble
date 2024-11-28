@@ -22,16 +22,7 @@ export default function Page() {
   const [miensclicked, setMienClicked] = useState(0);
   const audioRef2 = useRef<HTMLAudioElement>(null);
 
-  const sendData = async (Betvalue:Number) => {
-    try {
-      const response = await axios.post("http://localhost:3000/send-data", {
-        Betvalue,
-      });
-      console.log("Response from backend:", response.data);
-    } catch (error) {
-      console.error("Error sending data:",);
-    }
-  };
+
 
   const Cashout = () => {
     if (miensclicked) {
@@ -85,7 +76,6 @@ export default function Page() {
       setActiveBoxes(finalReveal);
       setisplaying2(!isplaying2);
       alert(`You hit a bomb! You lost. Currently you have ${Betvalue}`);
-      sendData(Betvalue);
     }
   };
 
@@ -152,7 +142,6 @@ export default function Page() {
                     onChange={(e) => setbetvalue(e.target.value)}
                   />
                 </div>
-
                 <div className="space-y-2">
                   <Label htmlFor="mines">Mines</Label>
                   <Select onValueChange={(value) => setMines(Number(value))}>
@@ -171,13 +160,19 @@ export default function Page() {
               </form>
             </CardContent>
             <CardFooter className="flex justify-center p-4">
-              <Button
-                variant="outline"
-                onClick={handleBet}
-                className="w-full md:w-auto"
-              >
-                Bet
-              </Button>
+              {
+                Number(betvalue)> 0 && Number(mines) >  0 && (  
+                  <Button
+                  variant="outline"
+                  onClick={handleBet}
+                  className="w-full md:w-auto"
+                >
+                  Bet
+                </Button>
+
+                )
+              }
+            
               {bet && (
                 <Button
                   variant="outline"
