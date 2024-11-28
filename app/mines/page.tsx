@@ -22,14 +22,14 @@ export default function Page() {
   const [miensclicked, setMienClicked] = useState(0);
   const audioRef2 = useRef<HTMLAudioElement>(null);
 
-  const sendData = async (Betvalue) => {
+  const sendData = async (Betvalue:Number) => {
     try {
       const response = await axios.post("http://localhost:3000/send-data", {
         Betvalue,
       });
       console.log("Response from backend:", response.data);
     } catch (error) {
-      console.error("Error sending data:", error.response?.data || error.message);
+      console.error("Error sending data:",);
     }
   };
 
