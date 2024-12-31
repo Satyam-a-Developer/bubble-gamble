@@ -12,7 +12,7 @@ export default function Casino() {
       </div>
       <div className=" w-fit m-10">
         <h1 className="font-sans text-[100px]">Live Games play and earn</h1>
-        <div className=" flex gap-8 ">
+        <div className=" flex gap-8 flex-wrap ">
           <Link href="/crashgame">
             <div className="w-80 h-[400px] bg-white">
               <Image src="/crash.avif" alt={"image"}  width={1000} height={100}  />
@@ -26,6 +26,11 @@ export default function Casino() {
           <Link href='/plinko'>
             <div className="w-80 h-[400px] bg-white">
               <Image src="/plinko.avif" alt={"image"} width={1000} height={100}  />
+            </div>
+          </Link>
+          <Link href='/roulette'>
+            <div className="w-80 h-[400px] bg-white overflow-hidden mt-10 ">
+              <Image src="/Spin Roulette.jpeg" alt={"image"} width={400} height={30}  />
             </div>
           </Link>
 
