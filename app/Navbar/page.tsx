@@ -1,9 +1,9 @@
-'use client'
+"use client";
 
-import React, { useState, useEffect } from 'react'
-import Image from 'next/image'
-import Link from 'next/link'
-import axios from 'axios'
+import React, { useState, useEffect } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import axios from "axios";
 
 export default function Page() {
   const [MoneyinvestedINR, setMoneyinvestedINR] = useState(50000);
@@ -11,7 +11,10 @@ export default function Page() {
     <div>
       <nav className="bg-gray-900 dark:bg-gray-900 fixed w-full z-20 top-0 start-0 border-b border-gray-200 dark:border-gray-600">
         <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
-          <a href="http://localhost:3000" className="flex items-center space-x-3 rtl:space-x-reverse">
+          <a
+            href="http://localhost:3000"
+            className="flex items-center space-x-3 rtl:space-x-reverse"
+          >
             <Image
               src="/logo.png"
               className="h-8"
@@ -72,5 +75,5 @@ export default function Page() {
         </div>
       </nav>
     </div>
-  )
+  );
 }
