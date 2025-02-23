@@ -1,7 +1,6 @@
 'use client';
 import { useMemo, useRef, useState } from 'react';
 import Matter, { Engine, World, Bodies, Events, IEventCollision } from 'matter-js';
-import SectionProfitFooterChart from '../Graph/page';
 
 interface BallResult {
   ballId: number;
@@ -114,7 +113,7 @@ const MatterScene = () => {
               100 + row * spacing,
               pegRadius,
               {
-                
+
                 isStatic: true,
                 render: { fillStyle: '#3498db' },
                 friction: 0.3, // Increased friction
@@ -215,7 +214,7 @@ const MatterScene = () => {
 
   const createSlowerBall = () => {
     if (!engineRef.current) return null;
-    
+
     return Bodies.circle(
       Math.floor(Math.random() * (410 - 390 + 1)) + 390,
       50,
