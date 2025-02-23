@@ -161,7 +161,7 @@ export default function Page() {
             </CardContent>
             <CardFooter className="flex justify-center p-4">
               {
-                Number(betvalue)> 0 && Number(mines) >  0 && (  
+                Number(betvalue)> 0 && Number(mines) >  0 && (
                   <Button
                   variant="outline"
                   onClick={handleBet}
@@ -172,7 +172,7 @@ export default function Page() {
 
                 )
               }
-            
+
               {bet && (
                 <Button
                   variant="outline"

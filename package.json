@@ -24,6 +24,7 @@
     "cors": "^2.8.5",
     "embla-carousel-react": "^8.0.2",
     "express": "^4.21.1",
+    "framer-motion": "^12.4.7",
     "install": "^0.13.0",
     "lucide-react": "^0.469.0",
     "matter-js": "^0.20.0",
