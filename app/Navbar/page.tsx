@@ -62,14 +62,6 @@ export default function Page() {
                   <option>0.00BTC</option>
                 </select>
               </li>
-              <li>
-                <Link
-                  href="/Sports"
-                  className="block py-2 px-3 text-gray-900 rounded bg-slate-500 hover:bg-slate-600"
-                >
-                  Sports
-                </Link>
-              </li>
             </ul>
           </div>
         </div>
