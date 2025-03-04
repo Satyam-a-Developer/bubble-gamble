@@ -28,11 +28,7 @@ export default function Casino() {
               <Image src="/plinko.avif" alt={"image"} width={1000} height={100}  />
             </div>
           </Link>
-          <Link href='/roulette'>
-            <div className="w-80 h-[400px] bg-white overflow-hidden mt-10 ">
-              <Image src="/Spin Roulette.jpeg" alt={"image"} width={400} height={30}  />
-            </div>
-          </Link>
+
 
         </div>
       </div>
